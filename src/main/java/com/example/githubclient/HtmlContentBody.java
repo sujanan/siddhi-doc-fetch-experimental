@@ -1,4 +1,4 @@
-package com.example.github;
+package com.example.githubclient;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

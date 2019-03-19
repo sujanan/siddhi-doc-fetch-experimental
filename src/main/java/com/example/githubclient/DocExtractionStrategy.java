@@ -1,4 +1,4 @@
-package com.example.github;
+package com.example.githubclient;
 
 public abstract class DocExtractionStrategy<T> {
 

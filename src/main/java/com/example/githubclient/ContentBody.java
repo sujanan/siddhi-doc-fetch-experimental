@@ -1,4 +1,4 @@
-package com.example.github;
+package com.example.githubclient;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
@@ -12,7 +12,7 @@ public abstract class ContentBody<T> {
     ContentBody(HttpsURLConnection connection) throws IOException {
         connection.setRequestProperty(
                 "Accept",
-                "application/vnd.github.v3." + mediaType());
+                "application/vnd.githubclient.v3." + mediaType());
         stream = connection.getInputStream();
     }
 
