@@ -41,8 +41,7 @@ public abstract class ContentResponse<T> {
             throw new IllegalStateException("Response is a non error stream");
         }
         if (stream == null) {
-            /* According to RFC-4627 valid minimum JSON is either '{}' or '[]' */
-            return new JSONObject("{}");
+            return new JSONObject();
         }
         return new JSONObject(IOUtils.toString(stream, "UTF-8"));
     }
