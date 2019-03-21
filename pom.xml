@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.example</groupId>
-  <artifactId>extension-doc-fetch-exp</artifactId>
+  <artifactId>siddhi-doc-fetch-experimental</artifactId>
   <version>1.0-SNAPSHOT</version>
 
   <name>extension-doc-fetch-exp</name>
