@@ -1,11 +1,12 @@
 package com.example;
 
 import com.example.githubclient.GithubContentsClient;
-import com.example.githubclient.HtmlContentBody;
+import com.example.githubclient.HtmlContentResponse;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZoneOffset;
@@ -15,6 +16,10 @@ import java.util.logging.Logger;
 
 public class DocRetriever {
     private static final Logger LOG = Logger.getLogger(DocRetriever.class.getName());
+
+    private static final String CREDENTIALS_PROPERTIES = "credentials.properties";
+    private static final String CLIENT_ID = "client_id";
+    private static final String CLIENT_SECRET = "client_secret";
 
     private final String baseRepo;
     private final String[] extensions;
@@ -32,30 +37,7 @@ public class DocRetriever {
         }
     }
 
-    public void init() throws Exception {
-        if (docStore == null) {
-            return;
-        }
-        Properties credentials = new Properties();
-        Path credentialsPath = Paths.get(
-                DocRetriever.class.getClassLoader().getResource("credentials.properties").toURI());
-        credentials.load(new FileInputStream(credentialsPath.toString()));
-        String clientId = credentials.getProperty("client_id");
-        String clientSecret = credentials.getProperty("client_secret");
-
-        for (String extension : extensions) {
-            GithubContentsClient client = new GithubContentsClient.Builder(baseRepo, extension)
-                    .isReadme(true)
-                    .queryParam("client_id", clientId)
-                    .queryParam("client_secret", clientSecret)
-                    .build();
-            String firstParagraph = client.getBody(HtmlContentBody.class).getFirstParagraph();
-            docStore.add(extension, firstParagraph);
-        }
-        docStore.commit().updateSource();
-    }
-
-    public void fetch() throws IOException {
+    public void fetch() throws Exception {
         if (docStore == null) {
             return;
         }
@@ -63,12 +45,84 @@ public class DocRetriever {
                 .withZone(ZoneOffset.UTC)
                 .format(docStore.lastModified().toInstant());
 
-        for  (String extension : extensions) {
+        int i = 0;
+        caller:
+        for (; i < extensions.length; i++) {
+            final String extension = extensions[i];
+
             GithubContentsClient client = new GithubContentsClient.Builder(baseRepo, extension)
                     .isReadme(true)
                     .build();
-            client.setHeader("If-Modified-Since", httpStandardLastModified);
-            int status = client.getStatus();
+            if (docStore.has(extension)) {
+                client.setHeader("If-Modified-Since", httpStandardLastModified);
+            }
+            HtmlContentResponse response = client.getContentResponse(HtmlContentResponse.class);
+            switch (response.getStatus()) {
+                case 304:
+                    continue;
+                case 403:
+                    break caller;
+                case 200:
+                    String firstParagraph = response.getFirstParagraph();
+                    if (firstParagraph == null) {
+                        continue;
+                    }
+                    docStore.add(extension, firstParagraph);
+                    break;
+            }
         }
+        Properties credentials = new Properties();
+        if (!loadCredentials(credentials)) {
+            return;
+        }
+
+        for (; i < extensions.length; i++) {
+            final String extension = extensions[i];
+
+            GithubContentsClient client = new GithubContentsClient.Builder(baseRepo, extension)
+                    .isReadme(true)
+                    .queryParam(CLIENT_ID, credentials.getProperty(CLIENT_ID))
+                    .queryParam(CLIENT_SECRET, credentials.getProperty(CLIENT_SECRET))
+                    .build();
+            if (docStore.has(extension)) {
+                client.setHeader("If-Modified-Since", httpStandardLastModified);
+            }
+            HtmlContentResponse response = client.getContentResponse(HtmlContentResponse.class);
+            switch (response.getStatus()) {
+                case 304:
+                    continue;
+                case 200:
+                    String firstParagraph = response.getFirstParagraph();
+                    if (firstParagraph == null) {
+                        continue;
+                    }
+                    docStore.add(extension, firstParagraph);
+                    break;
+            }
+        }
+        docStore.commit().updateSource();
+    }
+
+    private boolean loadCredentials(Properties credentials) {
+        URL credentialsUrl = DocRetriever.class.getClassLoader().getResource(CREDENTIALS_PROPERTIES);
+        if (credentialsUrl == null) {
+            return false;
+        }
+        Path credentialsPath;
+        try {
+            credentialsPath = Paths.get(credentialsUrl.toURI());
+        } catch (URISyntaxException e) {
+            return false;
+        }
+
+        try (FileInputStream stream = new FileInputStream(credentialsPath.toString())) {
+            credentials.load(stream);
+            if (credentials.getProperty(CLIENT_ID) == null || credentials.getProperty(CLIENT_SECRET) == null) {
+                return false;
+            }
+        } catch (IOException e) {
+            return false;
+        }
+        return true;
     }
 }

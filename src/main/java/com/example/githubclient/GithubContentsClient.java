@@ -74,11 +74,7 @@ public class GithubContentsClient {
         connection.setRequestProperty(key, val);
     }
 
-    public int getStatus() throws IOException {
-        return connection.getResponseCode();
-    }
-
-    public <T extends ContentBody> T getBody(Class<T> tClass) throws Exception {
+    public <T extends ContentResponse> T getContentResponse(Class<T> tClass) throws Exception {
         Constructor<T> constructor = tClass.getDeclaredConstructor(HttpsURLConnection.class);
         constructor.setAccessible(true);
         return constructor.newInstance(connection);

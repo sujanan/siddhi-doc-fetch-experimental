@@ -36,9 +36,12 @@ public class DocStore {
         inputStream.close();
     }
 
-    public DocStore add(String extension, String doc) {
+    public boolean has(String extension) {
+        return properties.getProperty(extension) != null;
+    }
+
+    public void add(String extension, String doc) {
         properties.setProperty(extension, doc);
-        return this;
     }
 
     public SourceUpdater commit() throws IOException {

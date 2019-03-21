@@ -2,35 +2,71 @@ package com.example;
 
 public class Main {
 
-    private static final String WSO2_EXTENSIONS_REPO = "wso2-extensions";
+    private static final String EXTENSIONS_REPO = "wso2-extensions";
 
-    private static final String[] WSO2_EXTENSIONS = {
-            "siddhi-io-kafka",
+    private static final String[] EXTENSIONS = {
             "siddhi-execution-string",
-            "siddhi-store-rdbms",
-            "siddhi-io-http",
-            "siddhi-map-json",
-            "siddhi-io-rabbitmq",
-            "siddhi-map-xml",
+            "siddhi-execution-mat",
+            "siddhi-execution-time",
             "siddhi-execution-streamingml",
-            "siddhi-io-file",
+            "siddhi-execution-regex",
+            "siddhi-execution-markov",
+            "siddhi-execution-unique",
+            "siddhi-execution-map",
+            "siddhi-execution-unitconversion",
+            "siddhi-execution-extrema",
+            "siddhi-execution-timeseries",
+            "siddhi-execution-var",
+            "siddhi-execution-priority",
+            "siddhi-execution-reorder",
+            "siddhi-execution-sentiment",
+            "siddhi-execution-stats",
+            "siddhi-execution-geo",
+            "siddhi-execution-kalmanfilter",
+            "siddhi-execution-approximate",
+            "siddhi-execution-graph",
+            "siddhi-execution-tensorflow",
+            "siddhi-execution-env",
+            "siddhi-io-http",
+            "siddhi-io-kafka",
             "siddhi-io-tcp",
-            "siddhi-execution-math",
-            "siddhi-map-text",
+            "siddhi-io-wso2event",
             "siddhi-io-email",
-            "siddhi-execution-reorder"
+            "siddhi-io-jms",
+            "siddhi-io-file",
+            "siddhi-io-rabbitmq",
+            "siddhi-io-mqtt",
+            "siddhi-io-websocket",
+            "siddhi-io-sqs",
+            "siddhi-io-twitter",
+            "siddhi-io-cdc",
+            "siddhi-io-prometheus",
+            "siddhi-map-json",
+            "siddhi-map-xml",
+            "siddhi-map-binary",
+            "siddhi-map-text",
+            "siddhi-map-wso2event",
+            "siddhi-map-keyvalue",
+            "siddhi-map-csv",
+            "siddhi-store-rdbms",
+            "siddhi-store-solr",
+            "siddhi-store-mongodb",
+            "siddhi-store-hbase",
+            "siddhi-store-redis",
+            "siddhi-store-cassandra",
+            "siddhi-script-js",
+            "siddhi-script-scala",
+
+            "siddhi-gpl-execution-pmml",
+            "siddhi-gpl-execution-geo",
+            "siddhi-gpl-execution-nlp",
+            "siddhi-gpl-execution-r",
+            "siddhi-gpl-execution-streamingml",
+            "siddhi-gpl-script-r"
     };
 
     public static void main(String[] args) throws Exception {
-        /*
-        for (String extension : WSO2_EXTENSIONS) {
-            GithubContentsClient client = new GithubContentsClient.Builder(WSO2_EXTENSIONS_REPO, extension)
-                    .isReadme(true)
-                    .build();
-            String firstParagraph = client.getBody(HtmlContentBody.class).getFirstParagraph();
-        }
-        */
-        DocRetriever retriever = new DocRetriever(WSO2_EXTENSIONS_REPO, WSO2_EXTENSIONS);
-        retriever.init();
+        DocRetriever retriever = new DocRetriever(EXTENSIONS_REPO, EXTENSIONS);
+        retriever.fetch();
     }
 }
