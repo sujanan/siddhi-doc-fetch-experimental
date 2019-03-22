@@ -9,7 +9,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Properties;
+import java.util.TreeSet;
 
 public class DocStore {
     private static final String DOCSTORE_PROPERTIES = "docstore.properties";
@@ -23,7 +26,13 @@ public class DocStore {
     }
 
     public DocStore() throws IOException, URISyntaxException {
-        properties = new Properties();
+        properties = new Properties() {
+
+            @Override
+            public synchronized Enumeration<Object> keys() {
+                return Collections.enumeration(new TreeSet<>(super.keySet()));
+            }
+        };
 
         URL propertiesUrl = DocStore.class.getClassLoader().getResource(DOCSTORE_PROPERTIES);
         if (propertiesUrl == null) {
