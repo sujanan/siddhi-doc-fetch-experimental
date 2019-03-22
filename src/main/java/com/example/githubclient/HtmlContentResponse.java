@@ -11,16 +11,21 @@ import java.io.IOException;
 public class HtmlContentResponse extends ContentResponse<Document> {
 
     HtmlContentResponse(HttpsURLConnection connection) throws IOException {
-        super(connection, (DocExtractionStrategy<Document>) content -> {
-            Elements pTags = content.getElementsByTag("p");
-            if (pTags != null) {
-                Element firstPTag = pTags.first();
-                if (firstPTag != null) {
-                    return firstPTag.text();
+        super(connection);
+        super.docExtractor = new DocExtractor<Document, HtmlContentResponse>(this) {
+
+            @Override
+            String getFirstParagraph(Document content) {
+                Elements pTags = content.getElementsByTag("p");
+                if (pTags != null) {
+                    Element firstPTag = pTags.first();
+                    if (firstPTag != null) {
+                        return firstPTag.text();
+                    }
                 }
+                return null;
             }
-            return null;
-        });
+        };
     }
 
     @Override

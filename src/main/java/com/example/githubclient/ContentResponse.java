@@ -11,9 +11,9 @@ public abstract class ContentResponse<T> {
 
     final InputStream stream;
     private final int status;
-    private DocExtractionStrategy docExtractionStrategy = null;
+    DocExtractor docExtractor;
 
-    private ContentResponse(HttpsURLConnection connection) throws IOException {
+    ContentResponse(HttpsURLConnection connection) throws IOException {
         connection.setRequestProperty(
                 "Accept",
                 "application/vnd.githubclient.v3." + mediaType());
@@ -22,13 +22,6 @@ public abstract class ContentResponse<T> {
             stream = connection.getErrorStream();
         } else {
             stream = connection.getInputStream();
-        }
-    }
-
-    ContentResponse(HttpsURLConnection connection, DocExtractionStrategy docExtractionStrategy) throws IOException {
-        this(connection);
-        if (status == 200) {
-            this.docExtractionStrategy = docExtractionStrategy;
         }
     }
 
@@ -50,9 +43,9 @@ public abstract class ContentResponse<T> {
         return status;
     }
 
-    public String getFirstParagraph() throws IOException {
-        if (docExtractionStrategy != null) {
-            return docExtractionStrategy.getFirstParagraph(getContent());
+    public String getFirstParagraph() {
+        if (docExtractor == null) {
+            throw new IllegalStateException(this.getClass().getName() + " does not implement the DocExtractor");
         }
         return null;
     }

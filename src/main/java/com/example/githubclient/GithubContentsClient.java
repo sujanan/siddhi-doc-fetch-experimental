@@ -1,5 +1,7 @@
 package com.example.githubclient;
 
+import org.jsoup.nodes.Document;
+
 import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
 import java.lang.reflect.Constructor;

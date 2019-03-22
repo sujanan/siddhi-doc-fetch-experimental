@@ -59,14 +59,17 @@ public class DocRetriever {
             HtmlContentResponse response = client.getContentResponse(HtmlContentResponse.class);
             switch (response.getStatus()) {
                 case 304:
+                    LOG.info(String.format("[%s] %s", extension, "Content was not modified."));
                     continue;
                 case 403:
+                    LOG.info("Maximum request quota exceeded. Falling back to Authorized routes.");
                     break caller;
                 case 200:
                     String firstParagraph = response.getFirstParagraph();
                     if (firstParagraph == null) {
                         continue;
                     }
+                    LOG.info(String.format("[%s] %s", extension, "Content was updated."));
                     docStore.add(extension, firstParagraph);
                     break;
             }
@@ -90,12 +93,14 @@ public class DocRetriever {
             HtmlContentResponse response = client.getContentResponse(HtmlContentResponse.class);
             switch (response.getStatus()) {
                 case 304:
+                    LOG.info(String.format("[%s] %s", extension, "Content was not modified."));
                     continue;
                 case 200:
                     String firstParagraph = response.getFirstParagraph();
                     if (firstParagraph == null) {
                         continue;
                     }
+                    LOG.info(String.format("[%s] %s", extension, "Content was updated."));
                     docStore.add(extension, firstParagraph);
                     break;
             }
