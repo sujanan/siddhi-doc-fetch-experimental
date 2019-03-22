@@ -72,6 +72,9 @@ public class DocRetriever {
                     LOG.info(String.format("[%s] %s", extension, "Content was updated."));
                     docStore.add(extension, firstParagraph);
                     break;
+                default:
+                    LOG.warning(response.getError().toString(2));
+                    break;
             }
         }
         Properties credentials = new Properties();
@@ -103,9 +106,12 @@ public class DocRetriever {
                     LOG.info(String.format("[%s] %s", extension, "Content was updated."));
                     docStore.add(extension, firstParagraph);
                     break;
+                default:
+                    LOG.warning(response.getError().toString(2));
+                    break;
             }
         }
-        docStore.commit().updateSource();
+        docStore.getUpdater().commit().updateSource();
     }
 
     private boolean loadCredentials(Properties credentials) {

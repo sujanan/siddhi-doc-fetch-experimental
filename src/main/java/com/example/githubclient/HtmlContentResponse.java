@@ -5,8 +5,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
+import javax.net.ssl.HttpsURLConnection;
 
 public class HtmlContentResponse extends ContentResponse<Document> {
 

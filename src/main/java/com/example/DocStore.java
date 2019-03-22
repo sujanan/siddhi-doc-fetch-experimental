@@ -18,8 +18,12 @@ public class DocStore {
     private static final String DOCSTORE_PROPERTIES = "docstore.properties";
 
     private final Path propertiesPath;
-
     private final Properties properties;
+    private boolean hasUpdated = false;
+
+    public interface CommitStep {
+        SourceUpdateStep commit() throws IOException;
+    }
 
     public interface SourceUpdateStep {
         boolean updateSource() throws IOException;
@@ -51,24 +55,33 @@ public class DocStore {
 
     public void add(String extension, String doc) {
         properties.setProperty(extension, doc);
-    }
-
-    public SourceUpdater commit() throws IOException {
-        FileOutputStream outputStream = new FileOutputStream(propertiesPath.toString());
-        properties.store(outputStream, null);
-        outputStream.close();
-        return new SourceUpdater(properties);
+        /* TODO: Remove the update hack with a memento. */
+        hasUpdated = true;
     }
 
     public FileTime lastModified() throws IOException {
         return Files.getLastModifiedTime(propertiesPath);
     }
 
-    public static class SourceUpdater implements SourceUpdateStep {
-        private final Properties properties;
+    public CommitStep getUpdater() {
+        return (hasUpdated) ? new Updater(properties, propertiesPath) : new NullUpdater();
+    }
 
-        private SourceUpdater(Properties properties) {
+    public static class Updater implements CommitStep, SourceUpdateStep {
+        private final Properties properties;
+        private final Path propertiesPath;
+
+        private Updater(Properties properties, Path propertiesPath) {
             this.properties = properties;
+            this.propertiesPath = propertiesPath;
+        }
+
+        @Override
+        public SourceUpdateStep commit() throws IOException {
+            FileOutputStream outputStream = new FileOutputStream(propertiesPath.toString());
+            properties.store(outputStream, null);
+            outputStream.close();
+            return this;
         }
 
         @Override
@@ -80,6 +93,19 @@ public class DocStore {
             FileOutputStream outputStream = new FileOutputStream(srcPath.toString());
             properties.store(outputStream, null);
             return true;
+        }
+    }
+
+    public static class NullUpdater implements CommitStep, SourceUpdateStep {
+
+        @Override
+        public SourceUpdateStep commit() throws IOException {
+            return this;
+        }
+
+        @Override
+        public boolean updateSource() throws IOException {
+            return false;
         }
     }
 }

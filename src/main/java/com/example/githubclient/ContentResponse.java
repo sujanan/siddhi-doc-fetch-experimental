@@ -3,9 +3,9 @@ package com.example.githubclient;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
-import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
 import java.io.InputStream;
+import javax.net.ssl.HttpsURLConnection;
 
 public abstract class ContentResponse<T> {
 
@@ -43,10 +43,10 @@ public abstract class ContentResponse<T> {
         return status;
     }
 
-    public String getFirstParagraph() {
+    public String getFirstParagraph() throws IOException {
         if (docExtractor == null) {
             throw new IllegalStateException(this.getClass().getName() + " does not implement the DocExtractor");
         }
-        return null;
+        return docExtractor.getFirstParagraph();
     }
 }
