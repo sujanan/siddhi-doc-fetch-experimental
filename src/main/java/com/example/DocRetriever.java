@@ -69,11 +69,11 @@ public class DocRetriever {
                     if (firstParagraph == null) {
                         continue;
                     }
-                    LOG.info(String.format("[%s] %s", extension, "Content was updated."));
+                    LOG.info(String.format("[%s] %s", extension, "Content was modified."));
                     docStore.add(extension, firstParagraph);
                     break;
                 default:
-                    LOG.warning(response.getError().toString(2));
+                    LOG.warning(response.getError().toString());
                     break;
             }
         }
@@ -103,11 +103,11 @@ public class DocRetriever {
                     if (firstParagraph == null) {
                         continue;
                     }
-                    LOG.info(String.format("[%s] %s", extension, "Content was updated."));
+                    LOG.info(String.format("[%s] %s", extension, "Content was modified."));
                     docStore.add(extension, firstParagraph);
                     break;
                 default:
-                    LOG.warning(response.getError().toString(2));
+                    LOG.warning(response.getError().toString());
                     break;
             }
         }
